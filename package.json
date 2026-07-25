@@ -2,7 +2,7 @@
   "name": "simple-project-switcher",
   "displayName": "Simple Project Switcher",
   "description": "Save and switch VS Code projects from the sidebar.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "rmsc",
   "icon": "resources/icon.png",
   "license": "MIT",

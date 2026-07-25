@@ -1,6 +1,6 @@
 # Change Log
 
-## Unreleased
+## 0.1.1
 
 - Store projects in the user settings JSON.
 - Add optional project groups.
