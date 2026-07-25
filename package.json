@@ -1,0 +1,185 @@
+{
+  "name": "simple-project-switcher",
+  "displayName": "Simple Project Switcher",
+  "description": "Save and switch VS Code projects from the sidebar.",
+  "version": "0.1.0",
+  "publisher": "rmsc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ramusuco/simple-project-switcher.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "projects",
+    "sidebar",
+    "workspace",
+    "project manager"
+  ],
+  "activationEvents": [
+    "onView:simpleProjectSwitcher.projects",
+    "onCommand:simpleProjectSwitcher.saveCurrent",
+    "onCommand:simpleProjectSwitcher.addFromDisk",
+    "onCommand:simpleProjectSwitcher.edit",
+    "onCommand:simpleProjectSwitcher.delete",
+    "onCommand:simpleProjectSwitcher.open",
+    "onCommand:simpleProjectSwitcher.openNewWindow",
+    "onCommand:simpleProjectSwitcher.openSettingsJson",
+    "onCommand:simpleProjectSwitcher.refresh"
+  ],
+  "main": "./src/extension.js",
+  "extensionKind": [
+    "ui"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "configuration": {
+      "title": "Simple Project Switcher",
+      "properties": {
+        "simpleProjectSwitcher.projects": {
+          "type": "array",
+          "scope": "machine",
+          "default": [],
+          "description": "Projects shown in the Simple Project Switcher.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "path"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Project name."
+              },
+              "path": {
+                "type": "string",
+                "description": "Folder path, workspace file, or URI."
+              },
+              "group": {
+                "type": "string",
+                "description": "Optional group name."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "simpleProjectSwitcher.saveCurrent",
+        "title": "Simple Project Switcher: Save Current Project",
+        "icon": "$(bookmark)"
+      },
+      {
+        "command": "simpleProjectSwitcher.addFromDisk",
+        "title": "Simple Project Switcher: Add Project from Folder or Workspace",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "simpleProjectSwitcher.edit",
+        "title": "Simple Project Switcher: Edit Project",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "simpleProjectSwitcher.delete",
+        "title": "Simple Project Switcher: Delete Project",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "simpleProjectSwitcher.open",
+        "title": "Simple Project Switcher: Open Project"
+      },
+      {
+        "command": "simpleProjectSwitcher.openNewWindow",
+        "title": "Simple Project Switcher: Open Project in New Window",
+        "icon": "$(empty-window)"
+      },
+      {
+        "command": "simpleProjectSwitcher.openSettingsJson",
+        "title": "Simple Project Switcher: Open Settings JSON",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "simpleProjectSwitcher.refresh",
+        "title": "Simple Project Switcher: Refresh Projects",
+        "icon": "$(refresh)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "simpleProjectSwitcher",
+          "title": "Projects",
+          "icon": "resources/projects.svg"
+        }
+      ]
+    },
+    "views": {
+      "simpleProjectSwitcher": [
+        {
+          "id": "simpleProjectSwitcher.projects",
+          "name": "Projects"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "simpleProjectSwitcher.saveCurrent",
+          "when": "view == simpleProjectSwitcher.projects",
+          "group": "navigation@1"
+        },
+        {
+          "command": "simpleProjectSwitcher.addFromDisk",
+          "when": "view == simpleProjectSwitcher.projects",
+          "group": "navigation@2"
+        },
+        {
+          "command": "simpleProjectSwitcher.refresh",
+          "when": "view == simpleProjectSwitcher.projects",
+          "group": "navigation@3"
+        },
+        {
+          "command": "simpleProjectSwitcher.openSettingsJson",
+          "when": "view == simpleProjectSwitcher.projects",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "simpleProjectSwitcher.openNewWindow",
+          "when": "view == simpleProjectSwitcher.projects && viewItem == project",
+          "group": "inline@1"
+        },
+        {
+          "command": "simpleProjectSwitcher.edit",
+          "when": "view == simpleProjectSwitcher.projects && viewItem == project",
+          "group": "1_modification@1"
+        },
+        {
+          "command": "simpleProjectSwitcher.delete",
+          "when": "view == simpleProjectSwitcher.projects && viewItem == project",
+          "group": "1_modification@2"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "check": "node --check src/extension.js",
+    "test": "node --test test/*.test.js"
+  }
+}

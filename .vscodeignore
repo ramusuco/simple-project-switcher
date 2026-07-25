@@ -1,0 +1,8 @@
+.git/**
+.github/**
+.vscode/**
+.gitignore
+.vscodeignore
+test/**
+*.vsix
+debug.log
