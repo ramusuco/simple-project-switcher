@@ -235,6 +235,67 @@ async function resolveProject(store, project, placeHolder) {
   return project?.path ? project : pickProject(store, placeHolder);
 }
 
+function existingGroups(store) {
+  const groups = new Map();
+
+  for (const project of store.getAll()) {
+    const group = project.group.trim();
+    const key = group.toLocaleLowerCase();
+    if (group && !groups.has(key)) {
+      groups.set(key, group);
+    }
+  }
+
+  return [...groups.values()].sort(compareNames);
+}
+
+async function chooseGroup(store, currentGroup = '') {
+  const groups = existingGroups(store);
+  if (groups.length === 0) {
+    const group = await vscode.window.showInputBox({
+      prompt: 'Group (optional)',
+      placeHolder: 'Frontend',
+      value: currentGroup,
+    });
+    return group === undefined ? undefined : group.trim();
+  }
+
+  const selected = await vscode.window.showQuickPick(
+    [
+      ...groups.map((group) => ({ label: group, group })),
+      {
+        label: 'No group',
+        description: 'Leave this project ungrouped',
+        group: '',
+      },
+      {
+        label: 'Create new group...',
+        description: 'Enter a group name',
+        create: true,
+      },
+    ],
+    {
+      title: 'Group',
+      placeHolder: 'Select an existing group or create a new one',
+      matchOnDescription: true,
+    },
+  );
+
+  if (!selected) {
+    return undefined;
+  }
+
+  if (!selected.create) {
+    return selected.group;
+  }
+
+  const group = await vscode.window.showInputBox({
+    prompt: 'New group name',
+    placeHolder: 'Frontend',
+  });
+  return group === undefined ? undefined : group.trim();
+}
+
 async function addProject(store, provider, uri, suggestedName) {
   if (!(await projectExists(uri))) {
     void vscode.window.showErrorMessage(
@@ -259,10 +320,7 @@ async function addProject(store, provider, uri, suggestedName) {
     return;
   }
 
-  const group = await vscode.window.showInputBox({
-    prompt: 'Group (optional)',
-    placeHolder: 'Frontend',
-  });
+  const group = await chooseGroup(store);
   if (group === undefined) {
     return;
   }
@@ -325,45 +383,14 @@ async function editProject(store, provider, project) {
     return;
   }
 
-  const group = await vscode.window.showInputBox({
-    prompt: 'Group (optional)',
-    placeHolder: 'Frontend',
-    value: selected.group,
-  });
+  const group = await chooseGroup(store, selected.group);
   if (group === undefined) {
     return;
   }
 
-  const locationInput = await vscode.window.showInputBox({
-    prompt: 'Folder path, workspace file, or URI',
-    value: displayUri(projectUri(selected)),
-    validateInput: (value) => (value.trim() ? undefined : 'Enter a location.'),
-  });
-  if (locationInput === undefined) {
-    return;
-  }
-
-  const uri = parseLocation(locationInput);
-  if (!(await projectExists(uri))) {
-    void vscode.window.showErrorMessage(
-      'The location must be an existing folder or .code-workspace file.',
-    );
-    return;
-  }
-
-  const path = storedPath(uri);
-  if (
-    store
-      .getAll()
-      .some((saved) => saved.path !== selected.path && saved.path === path)
-  ) {
-    void vscode.window.showErrorMessage('This project is already saved.');
-    return;
-  }
-
   await store.update(selected.path, {
+    ...selected,
     name: name.trim(),
-    path,
     group: group.trim(),
   });
   provider.refresh();
@@ -422,7 +449,7 @@ async function reportErrors(action) {
     await action();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    void vscode.window.showErrorMessage(`Simple Project Switcher: ${message}`);
+    void vscode.window.showErrorMessage(message);
   }
 }
 

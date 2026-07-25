@@ -82,41 +82,41 @@
     "commands": [
       {
         "command": "simpleProjectSwitcher.saveCurrent",
-        "title": "Simple Project Switcher: Save Current Project",
+        "title": "Save Current Project",
         "icon": "$(bookmark)"
       },
       {
         "command": "simpleProjectSwitcher.addFromDisk",
-        "title": "Simple Project Switcher: Add Project from Folder or Workspace",
+        "title": "Add Project from Folder or Workspace",
         "icon": "$(folder-opened)"
       },
       {
         "command": "simpleProjectSwitcher.edit",
-        "title": "Simple Project Switcher: Edit Project",
+        "title": "Edit Project",
         "icon": "$(edit)"
       },
       {
         "command": "simpleProjectSwitcher.delete",
-        "title": "Simple Project Switcher: Delete Project",
+        "title": "Delete Project",
         "icon": "$(trash)"
       },
       {
         "command": "simpleProjectSwitcher.open",
-        "title": "Simple Project Switcher: Open Project"
+        "title": "Open Project"
       },
       {
         "command": "simpleProjectSwitcher.openNewWindow",
-        "title": "Simple Project Switcher: Open Project in New Window",
+        "title": "Open in New Window",
         "icon": "$(empty-window)"
       },
       {
         "command": "simpleProjectSwitcher.openSettingsJson",
-        "title": "Simple Project Switcher: Open Settings JSON",
+        "title": "Open Settings JSON",
         "icon": "$(gear)"
       },
       {
         "command": "simpleProjectSwitcher.refresh",
-        "title": "Simple Project Switcher: Refresh Projects",
+        "title": "Refresh Projects",
         "icon": "$(refresh)"
       }
     ],

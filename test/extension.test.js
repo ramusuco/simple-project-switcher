@@ -6,6 +6,7 @@ test('stores projects in settings and groups them in the tree', async () => {
   const commandHandlers = new Map();
   const inputResponses = [];
   const dialogResponses = [];
+  const quickPickResponses = [];
   const warningResponses = [];
   const openedFolders = [];
   const errors = [];
@@ -122,7 +123,10 @@ test('stores projects in settings and groups them in the tree', async () => {
       },
       showInputBox: async () => inputResponses.shift(),
       showOpenDialog: async () => dialogResponses.shift(),
-      showQuickPick: async () => undefined,
+      showQuickPick: async (items) => {
+        const response = quickPickResponses.shift();
+        return typeof response === 'function' ? response(items) : response;
+      },
       showWarningMessage: async () => warningResponses.shift(),
       showInformationMessage: () => {},
       showErrorMessage: (message) => {
@@ -164,21 +168,46 @@ test('stores projects in settings and groups them in the tree', async () => {
     assert.equal(projects[0].name, 'Alpha');
     assert.equal(provider.getTreeItem(projects[0]).contextValue, 'project');
 
+    dialogResponses.push([Uri.file('C:\\work\\beta')]);
+    inputResponses.push('Beta');
+    quickPickResponses.push((items) =>
+      items.find((item) => item.group === 'Frontend'),
+    );
+    await commandHandlers.get('simpleProjectSwitcher.addFromDisk')();
+
+    roots = provider.getChildren();
+    projects = provider.getChildren(roots[0]);
+    assert.deepEqual(
+      projects.map((project) => project.name),
+      ['Alpha', 'Beta'],
+    );
+    assert.equal(projects[1].group, 'Frontend');
+
     await commandHandlers.get('simpleProjectSwitcher.open')(projects[0]);
     assert.deepEqual(openedFolders[0][1], { forceReuseWindow: true });
 
     await commandHandlers.get('simpleProjectSwitcher.openNewWindow')(projects[0]);
     assert.deepEqual(openedFolders[1][1], { forceNewWindow: true });
 
-    inputResponses.push('Beta', 'Backend', 'C:\\work\\beta');
+    inputResponses.push('Alpha Renamed');
+    quickPickResponses.push((items) =>
+      items.find((item) => item.group === ''),
+    );
     await commandHandlers.get('simpleProjectSwitcher.edit')(projects[0]);
 
     roots = provider.getChildren();
-    assert.equal(provider.getTreeItem(roots[0]).label, 'Backend');
-    projects = provider.getChildren(roots[0]);
-    assert.equal(projects[0].name, 'Beta');
-    assert.equal(projects[0].path, 'C:\\work\\beta');
+    const frontend = roots.find(
+      (root) => provider.getTreeItem(root).label === 'Frontend',
+    );
+    const edited = roots.find((root) => root.name === 'Alpha Renamed');
+    assert.equal(provider.getChildren(frontend)[0].name, 'Beta');
+    assert.equal(edited.path, 'C:\\work\\alpha');
+    assert.equal(edited.group, '');
 
+    warningResponses.push('Delete');
+    await commandHandlers.get('simpleProjectSwitcher.delete')(edited);
+
+    projects = provider.getChildren(provider.getChildren()[0]);
     warningResponses.push('Delete');
     await commandHandlers.get('simpleProjectSwitcher.delete')(projects[0]);
     assert.equal(provider.getChildren().length, 0);
