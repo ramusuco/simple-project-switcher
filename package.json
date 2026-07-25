@@ -4,6 +4,7 @@
   "description": "Save and switch VS Code projects from the sidebar.",
   "version": "0.1.0",
   "publisher": "rmsc",
+  "icon": "resources/icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
