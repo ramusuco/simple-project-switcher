@@ -13,7 +13,7 @@ VS Codeのフォルダとワークスペースをサイドバーに保存し、�
 
 ## 設定
 
-プロジェクトはユーザーの `settings.json` に保存されます。
+プロジェクト設定はユーザーの `settings.json` に保存されます。
 
 ```json
 "simpleProjectSwitcher.projects": [
